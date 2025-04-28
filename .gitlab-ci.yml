@@ -1,0 +1,25 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  AWS_REGION: us-west-2
+  ECR_REPO: <your_ecr_repo_url>
+  CLUSTER_NAME: demo-eks
+
+before_script:
+  - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
+
+build:
+  stage: build
+  script:
+    - docker build -t $ECR_REPO/nodejs-app:latest .
+    - docker push $ECR_REPO/nodejs-app:latest
+
+deploy:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+    - kubectl apply -f k8s/nodejs-deployment.yaml
+    - kubectl apply -f k8s/mongodb-statefulset.yaml

@@ -1,0 +1,18 @@
+server:
+  global:
+    scrape_interval: 15s
+  persistentVolume:
+    enabled: true
+    storageClass: "gp2"
+    size: 10Gi
+  alertmanager:
+    enabled: false
+  configMapReload:
+    enabled: true
+  podMonitor:
+    enabled: true
+    interval: 15s
+
+prometheusSpec:
+  serviceMonitorSelectorNilUsesHelmValues: false
+  serviceMonitorSelector: {}
